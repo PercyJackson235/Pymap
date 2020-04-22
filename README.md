@@ -1,6 +1,7 @@
 # Pymap
 
 This is going a little Network Scanner written in python.
+
 Why
 * It is mostly an exercise in progamming, different computer communication protocols, projecting, and learning some of what is possible.
 * This tool won't be beating out tools like Nmap or the others, but that isn't it's job.
