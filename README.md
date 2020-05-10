@@ -1,7 +1,7 @@
 # Pymap
 
 ## Concept
-This is going a little Network Scanner written in python.
+This is a little Network Scanner written in python.
 
 ### Why
 * It is mostly an exercise in progamming, different computer communication protocols, projecting, and learning some of what is possible.
@@ -15,5 +15,10 @@ This is going a little Network Scanner written in python.
 
   
 ## Requirements
+- This tool depends on icmplib and scapy
+  - Both packages can be install with `pip3 install icmplib scapy`.
+  - Packages can be installed with `pip3 install -r requirements.txt`.
+- This tool also needs to be run as root or with sudo because it create raw packets.
 
 ## Similar applications
+- I have not made anything like this before, but this project was partially inspired by Nmap.
