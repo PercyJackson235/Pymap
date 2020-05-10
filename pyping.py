@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 '''A network ping tool written in python'''
 import socket
 from icmplib import multiping
