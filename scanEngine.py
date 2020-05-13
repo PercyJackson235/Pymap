@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-import argparse
 from pyping import pyping, create_list
 from scapy.all import IP, TCP, sr1
 
