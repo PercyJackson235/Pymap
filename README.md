@@ -9,9 +9,8 @@ This is a little Network Scanner written in python.
 
 ### What it does
 - This is eventually going to be a full network scanning tool.
-  - Will have the ability to ping multiple hosts on the network.
-  - Will be able to discover tcp and udp ports and services.
-  - Will be able to enumerate service versions and check for remote access.
+  - currently has the ability to ping multiple hosts on the network.
+  - is able to discover TCP ports.
 
   
 ## Requirements
