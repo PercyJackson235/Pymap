@@ -3,7 +3,7 @@ import argparse
 import scanEngine
 import random
 import Data
-
+import time
 
 parser = argparse.ArgumentParser(description="Just a Python Network Scanning Tool.")
 group = parser.add_mutually_exclusive_group()
@@ -16,10 +16,11 @@ args = parser.parse_args()
 
 if args.ports == None:
     args.ports = Data.ports
-
-random.shuffle(args.ports)
-args.ports = ','.join(args.ports)
+    random.shuffle(args.ports)
+    args.ports = ','.join(args.ports)
 
 scanner = scanEngine.Scanner(args.targets, args.threads, args.ports, args.ping, args.no_scan)
+start = time.perf_counter()
 scanner.start()
-
+print(f'Full scan took {time.perf_counter() - start:.04f} secs')
+print('\a')
