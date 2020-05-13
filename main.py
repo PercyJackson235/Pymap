@@ -8,7 +8,7 @@ import Data
 parser = argparse.ArgumentParser(description="Just a Python Network Scanning Tool.")
 group = parser.add_mutually_exclusive_group()
 parser.add_argument("targets", nargs='+', help="Hosts and/or Networks comma delimeted.")
-group.add_argument("-ns","--no-scan", default=False, help="This option disables TCP Scan. Mutually exclusive with -p")
+group.add_argument("-ns","--no-scan", default=False, help="This option disables TCP Scan. Mutually exclusive with -p", action="store_true")
 group.add_argument("-p","--ports", help="Ports can be comma delimeted for specfic ports and dashed for a range.")
 parser.add_argument("-t","--threads", type=int, default=300, help="The amount of threads for pyping to use. Default is 300.")
 parser.add_argument("-P","--ping", help="Does a ping scan on targets before port scanning.", action="store_true")
