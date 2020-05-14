@@ -38,7 +38,7 @@ class Scanner:
         return [ i for i in scan if i[TCP].flags.value == 18 ]
 
     def start(self):
-        '''This function starts the Scan Object'''
+        '''This function starts the Scanner Object'''
         if self.ping:
             self.targets = pyping(self.targets, self.threads)
         else:
@@ -53,7 +53,7 @@ class Scanner:
                 self.results[target] = result
             for key in self.results.keys():
                 if key != None:
-                    print(f'Host:{key:>15}')
+                    print(f'Host:{key:>22}')
                     if len(self.results[key]) != 0:
                         if self.results.get(key) != None:
                             ports = sorted([int(i[TCP].sport) for i in self.results[key] ])
