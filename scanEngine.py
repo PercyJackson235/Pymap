@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 from pyping import pyping, create_list
 from scapy.all import IP, TCP, sr1
+import asyncio
 
 class Scanner:
     def __init__(self, targets, threads=None, ports=None, pings=False, no_scan=False):
@@ -27,15 +28,20 @@ class Scanner:
                 portlist.extend([int(i)])
         self.ports = portlist
 
-    def portscan(self, target):
+    async def portscan(self, target):
         '''A port scanner powered by scapy. Allows us to create 
         packets how ever we like. Takes a target and a list of
         ports, and returns a list of ports that resonded with a
         SYN-ACK.'''
-        pks = [ i for i in IP(dst=target)/TCP(dport=self.ports,flags="S") ]
-        scan = [sr1(i, verbose=0, timeout=.1) for i in pks ]
+        packets = [ i for i in IP(dst=target)/TCP(dport=self.ports,flags="S") ]
+        #scan = [sr1(i, verbose=0, timeout=.1) for i in packets ]
+        scan = [ await packetsend(pkt) for pkt in packets ]
         scan = [ i for i in scan if i != None ]
         return [ i for i in scan if i[TCP].flags.value == 18 ]
+
+    async def packetsend(self, packet):
+        response = sr1(packet, verbose=1, timeout=.1)
+        return response
 
     def start(self):
         '''This function starts the Scanner Object'''
@@ -49,7 +55,7 @@ class Scanner:
         if not self.no_scan:
             self.portlister()
             for target in self.targets:
-                result = self.portscan(target)
+                result = asyncio.run(self.portscan(target))
                 self.results[target] = result
             for key in self.results.keys():
                 if key != None:
