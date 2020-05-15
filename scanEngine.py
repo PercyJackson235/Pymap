@@ -40,7 +40,7 @@ class Scanner:
         return [ i for i in scan if i[TCP].flags.value == 18 ]
 
     async def packetsend(self, packet):
-        response = sr1(packet, verbose=1, timeout=.1)
+        response = sr1(packet, verbose=0, timeout=.1)
         return response
 
     def start(self):
