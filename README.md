@@ -15,6 +15,7 @@ This is a little Network Scanner written in python.
   
 ## Requirements
 - Currently only supported on linux
+- Needs python3.7
 - This tool depends on icmplib and scapy
   - Both packages can be install with `pip3 install icmplib scapy`.
   - Packages can be installed with `pip3 install -r requirements.txt`.
