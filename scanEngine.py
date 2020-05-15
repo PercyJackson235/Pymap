@@ -35,7 +35,7 @@ class Scanner:
         SYN-ACK.'''
         packets = [ i for i in IP(dst=target)/TCP(dport=self.ports,flags="S") ]
         #scan = [sr1(i, verbose=0, timeout=.1) for i in packets ]
-        scan = [ await packetsend(pkt) for pkt in packets ]
+        scan = [ await self.packetsend(pkt) for pkt in packets ]
         scan = [ i for i in scan if i != None ]
         return [ i for i in scan if i[TCP].flags.value == 18 ]
 
