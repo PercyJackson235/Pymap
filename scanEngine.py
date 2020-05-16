@@ -37,7 +37,7 @@ class Scanner:
         with concurrent.futures.ThreadPoolExecutor(max_workers=15) as executor:
             scan = executor.map(self.packetsend,packets)
         scan = [ i for i in scan if i != None ]
-        return [ i for i in scan if i[TCP].flags.value == 18 ]
+        return target,[ i for i in scan if i[TCP].flags.value == 18 ]
 
     def packetsend(self, packet):
         response = sr1(packet, verbose=0, timeout=.1)
@@ -54,9 +54,15 @@ class Scanner:
             self.targets = hosts
         if not self.no_scan:
             self.portlister()
-            for target in self.targets:
-                result = self.portscan(target)
-                self.results[target] = result
+            if len(self.targets) == 1:
+                for target in self.targets:
+                    _,result = self.portscan(target)
+                    self.results[target] = result
+            else:
+                with concurrent.futures.ProcessPoolExecutor() as executor:
+                    scanpool = executor.map(self.portscan, self.targets)
+                    for target,result in scanpool:
+                        self.results[target] = result
             for key in self.results.keys():
                 if key != None:
                     print(f'Host:{key:>22}')
