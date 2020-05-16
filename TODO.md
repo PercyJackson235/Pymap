@@ -6,7 +6,6 @@
     - [ ] Links to similar projects, or any documentation
 
 ## Future Features
-- [ ] Fix python3.7 dependency
 - [ ] UDP port scanning
 - [ ] Ability to enumerate services
 - [ ] Ablilty to enumerate service versions
