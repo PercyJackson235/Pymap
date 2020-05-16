@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 from pyping import pyping, create_list
 from scapy.all import IP, TCP, sr1
+import concurrent.futures
 
 class Scanner:
     def __init__(self, targets, threads=None, ports=None, pings=False, no_scan=False):
@@ -32,13 +33,18 @@ class Scanner:
         packets how ever we like. Takes a target and a list of
         ports, and returns a list of ports that resonded with a
         SYN-ACK.'''
-        pks = [ i for i in IP(dst=target)/TCP(dport=self.ports,flags="S") ]
-        scan = [sr1(i, verbose=0, timeout=.1) for i in pks ]
+        packets = [ i for i in IP(dst=target)/TCP(dport=self.ports,flags="S") ]
+        with concurrent.futures.ThreadPoolExecutor(max_workers=15) as executor:
+            scan = executor.map(self.packetsend,packets)
         scan = [ i for i in scan if i != None ]
-        return [ i for i in scan if i[TCP].flags.value == 18 ]
+        return target,[ i for i in scan if i[TCP].flags.value == 18 ]
+
+    def packetsend(self, packet):
+        response = sr1(packet, verbose=0, timeout=.1)
+        return response
 
     def start(self):
-        '''This function starts the Scan Object'''
+        '''This function starts the Scanner Object'''
         if self.ping:
             self.targets = pyping(self.targets, self.threads)
         else:
@@ -48,12 +54,18 @@ class Scanner:
             self.targets = hosts
         if not self.no_scan:
             self.portlister()
-            for target in self.targets:
-                result = self.portscan(target)
-                self.results[target] = result
+            if len(self.targets) == 1:
+                for target in self.targets:
+                    _,result = self.portscan(target)
+                    self.results[target] = result
+            else:
+                with concurrent.futures.ProcessPoolExecutor() as executor:
+                    scanpool = executor.map(self.portscan, self.targets)
+                    for target,result in scanpool:
+                        self.results[target] = result
             for key in self.results.keys():
                 if key != None:
-                    print(f'Host:{key:>15}')
+                    print(f'Host:{key:>22}')
                     if len(self.results[key]) != 0:
                         if self.results.get(key) != None:
                             ports = sorted([int(i[TCP].sport) for i in self.results[key] ])
@@ -61,7 +73,7 @@ class Scanner:
                             for port in ports:
                                 state = 'open'
                                 port += '/tcp'
-                                print(f'{port:<10}{state:>8}')
+                                print(f'{port:<10}{state:>10}')
                     print()
 
 
