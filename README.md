@@ -15,10 +15,13 @@ This is a little Network Scanner written in python.
   
 ## Requirements
 - Currently only supported on linux
-- This tool depends on icmplib and scapy
-  - Both packages can be install with `pip3 install icmplib scapy`.
+- This tool depends on icmplib, scapy, ldap3, and impacket
   - Packages can be installed with `pip3 install -r requirements.txt`.
 - This tool also needs to be run as root or with sudo because it create raw packets.
+- Leans on the Impacket Library for SMB Connections. That is not my own creation.
+  - Impacket Library is included with Pymap as impacketEngine, mostly because I was having
+    problems pip installing it properly, and the preferred way to install Impacket includes the
+    installing of the example tools onto your system, which is a little intrusive for this tool.
 
 ## Similar applications
 - I have not made anything like this before, but this project was partially inspired by Nmap.

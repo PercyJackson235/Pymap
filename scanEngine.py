@@ -1,16 +1,21 @@
 #!/usr/bin/env python3
-from pyping import pyping, create_list
+from pyping import pyping, create_list, dnsnames
 from scapy.all import IP, TCP, sr1
 import concurrent.futures
+import random
+from serviceEngine import serviceScanner
 
 class Scanner:
-    def __init__(self, targets, threads=None, ports=None, pings=False, no_scan=False):
+    def __init__(self, targets, threads=None, ports=None, pings=False, no_scan=False, service_scan=False):
         self.targets = targets
         self.threads = threads
         self.ports = ports
         self.ping = pings
         self.no_scan = no_scan
         self.results = {}
+        self.DomainNames = dnsnames
+        self.service_scan = service_scan
+        self.servicepool = ''
 
     def portlister(self):
         '''Takes in an string of comma delemited ports and 
@@ -26,6 +31,7 @@ class Scanner:
                 portlist.extend([a for a in range(int(fst),int(lst)+1)])
             else:
                 portlist.extend([int(i)])
+        random.shuffle(portlist)
         self.ports = portlist
 
     def portscan(self, target):
@@ -37,7 +43,7 @@ class Scanner:
         with concurrent.futures.ThreadPoolExecutor(max_workers=15) as executor:
             scan = executor.map(self.packetsend,packets)
         scan = [ i for i in scan if i != None ]
-        return target,[ i for i in scan if i[TCP].flags.value == 18 ]
+        return target,[ i for i in scan if i.getlayer(TCP) != None if i[TCP].flags.value == 18 ]
 
     def packetsend(self, packet):
         response = sr1(packet, verbose=0, timeout=.1)
@@ -65,15 +71,29 @@ class Scanner:
                         self.results[target] = result
             for key in self.results.keys():
                 if key != None:
-                    print(f'Host:{key:>22}')
                     if len(self.results[key]) != 0:
                         if self.results.get(key) != None:
                             ports = sorted([int(i[TCP].sport) for i in self.results[key] ])
+                            if self.service_scan:
+                                servicelister = serviceScanner((key,ports))
+                                self.servicepool = servicelister.start()
                             ports = [ str(i) for i in ports ]
+                            print(f'Host:{key:>22}')
                             for port in ports:
+                                sport = int(port)
                                 state = 'open'
                                 port += '/tcp'
-                                print(f'{port:<10}{state:>10}')
+                                if self.service_scan and self.servicepool[sport] != None:
+                                    if len(self.servicepool[sport]) != 0 and self.servicepool[sport] != None:
+                                        print(f'{port:<10}{state:>10}')
+                                        if type(self.servicepool[sport][0]) == type(tuple()):
+                                            print(self.servicepool[sport][0][0])
+                                            print(self.servicepool[sport][0][1])
+                                        else:
+                                            print(self.servicepool[sport][0])
+                                else:
+                                    print(f'{port:<10}{state:>10}')
+                    else:
+                        print(f'Host:{key:>22}')
+                        print('No Open Ports'.center(27))
                     print()
-
-

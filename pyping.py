@@ -7,6 +7,9 @@ import ipaddress
 import argparse
 from datetime import datetime
 from decimal import Decimal
+from collections import defaultdict
+
+dnsnames = defaultdict(list)
 
 def create_list(hosts):
     '''Creates a list of valid ip addresses to ping.
@@ -30,7 +33,10 @@ def create_list(hosts):
                 print(f'Host {host} is not valid because it is all digits.')
                 exit(0)
         try:
+            domain = host
             host = socket.gethostbyname(host)
+            global dnsnames
+            dnsnames[host].append(domain)
         except:
             print(f'Host {host} is not valid.')
             exit(0)
