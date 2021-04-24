@@ -54,13 +54,10 @@ class Scanner:
         if self.ping:
             self.targets = pyping(self.targets, self.threads)
         else:
-            hosts = []
-            for i in self.targets:
-                hosts.extend(create_list(i))
-            self.targets = hosts
+            self.targets = (create_list(i) for i in self.targets)
         if not self.no_scan:
             self.portlister()
-            if len(self.targets) == 1:
+            if len(self.targets) == 1:  # Going to have to find this, generators != len()
                 for target in self.targets:
                     _,result = self.portscan(target)
                     self.results[target] = result
@@ -86,7 +83,8 @@ class Scanner:
                                 if self.service_scan and self.servicepool[sport] != None:
                                     if len(self.servicepool[sport]) != 0 and self.servicepool[sport] != None:
                                         print(f'{port:<10}{state:>10}')
-                                        if type(self.servicepool[sport][0]) == type(tuple()):
+                                        #if type(self.servicepool[sport][0]) == type(tuple()):
+                                        if isinstance(self.servicepool[sport][0], tuple):
                                             print(self.servicepool[sport][0][0])
                                             print(self.servicepool[sport][0][1])
                                         else:
