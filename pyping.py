@@ -8,6 +8,7 @@ import argparse
 from datetime import datetime
 from decimal import Decimal
 from collections import defaultdict
+from itertools import chain
 
 dnsnames = defaultdict(list)
 
@@ -41,9 +42,10 @@ def create_list(hosts):
             print(f'Host {host} is not valid.')
             exit(0)
     if mask == None:
-        return [host]
+        return [host], 1
     else:
-        return [ str(i) for i in ipaddress.ip_network(host+'/'+mask, strict=False)]
+        host_network = ipaddress.ip_network(host+'/'+mask, strict=False)
+        return (str(host) for host in host_network), host_network.num_addresses
         
 def pyping(host_list=None, thr=300):
     '''Heart of pyping. This takes a list of hosts as an
@@ -51,15 +53,13 @@ def pyping(host_list=None, thr=300):
     will ping all the hosts and return a list of hosts 
     that responded.'''
     a = datetime.now()
-    targets = []
-    results = []
-    for i in host_list:
-        targets.extend(create_list(i))
+    targets = (create_list(host)[0] for host in host_list)
     try:
-        targets = multiping(targets, max_threads=thr)
+        targets = multiping(chain.from_iterable(targets), max_threads=thr)
     except:
         print("Something Went Wrong!")
         exit(1)
+    results = []
     for target in targets:
         if target.is_alive:
             print(f'Host {target.address} is alive!')

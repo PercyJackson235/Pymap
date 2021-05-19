@@ -4,6 +4,7 @@ from scapy.all import IP, TCP, sr1
 import concurrent.futures
 import random
 from serviceEngine import serviceScanner
+from itertools import chain
 
 class Scanner:
     def __init__(self, targets, threads=None, ports=None, pings=False, no_scan=False, service_scan=False):
@@ -53,12 +54,23 @@ class Scanner:
         '''This function starts the Scanner Object'''
         if self.ping:
             self.targets = pyping(self.targets, self.threads)
+            target_len = len(self.targets)
         else:
-            self.targets = (create_list(i) for i in self.targets)
+            # self.targets = (create_list(i) for i in self.targets)
+            target_len = 0
+            temp_targets = []
+            for target in self.targets:
+                target, num = create_list(target)
+                target_len += num
+                temp_targets.append(target)
+            self.targets = chain.from_iterable(temp_targets)
+            del temp_targets, num
         if not self.no_scan:
             self.portlister()
-            if len(self.targets) == 1:  # Going to have to find this, generators != len()
+            # if len(self.targets) == 1:  # Going to have to find this, generators != len()
+            if target_len == 1:
                 for target in self.targets:
+                    print(target)
                     _,result = self.portscan(target)
                     self.results[target] = result
             else:
